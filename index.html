@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Braze Docs — Afya</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0e0f11;--bg-card:#16181c;--bg-hover:#1c1f24;
+    --border:rgba(255,255,255,0.07);--border-strong:rgba(255,255,255,0.13);
+    --text:#e8eaed;--text-muted:#7a7f8a;--text-dim:#4a4f5a;
+    --accent:#4f8ef7;--accent-bg:rgba(79,142,247,0.1);--accent-border:rgba(79,142,247,0.3);
+    --green:#3ecf8e;--green-bg:rgba(62,207,142,0.1);--green-border:rgba(62,207,142,0.3);
+    --amber:#f5a623;--amber-bg:rgba(245,166,35,0.1);--amber-border:rgba(245,166,35,0.3);
+    --red:#f56565;--red-bg:rgba(245,101,101,0.08);
+    --purple:#a78bfa;--purple-bg:rgba(167,139,250,0.1);--purple-border:rgba(167,139,250,0.3);
+    --mono:'IBM Plex Mono',monospace;--sans:'Sora',sans-serif;
+    --radius:8px;--radius-lg:12px;--nav-w:220px;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.6;display:flex}
+
+  /* SIDEBAR NAV */
+  nav{width:var(--nav-w);flex-shrink:0;border-right:1px solid var(--border);height:100vh;position:sticky;top:0;display:flex;flex-direction:column;padding:1.25rem 0;overflow-y:auto;background:var(--bg)}
+  .nav-logo{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;color:var(--text);padding:0 1.25rem 1.25rem;border-bottom:1px solid var(--border);margin-bottom:1rem}
+  .logo-dot{width:8px;height:8px;background:var(--accent);border-radius:50%;animation:pulse 2.5s ease-in-out infinite;flex-shrink:0}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.85)}}
+  .nav-section{padding:0 1rem;margin-bottom:1.25rem}
+  .nav-section-label{font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);padding:0 0.25rem;margin-bottom:6px;display:block}
+  .nav-item{display:flex;align-items:center;gap:9px;padding:7px 10px;border-radius:7px;font-size:13px;color:var(--text-muted);cursor:pointer;transition:all 0.12s;border:none;background:transparent;width:100%;text-align:left;font-family:var(--sans)}
+  .nav-item:hover{color:var(--text);background:var(--bg-hover)}
+  .nav-item.active{color:var(--accent);background:var(--accent-bg)}
+  .nav-dot{width:6px;height:6px;border-radius:50%;background:var(--border-strong);flex-shrink:0;transition:background 0.12s}
+  .nav-item.active .nav-dot{background:var(--accent)}
+  .nav-divider{height:1px;background:var(--border);margin:0.5rem 1rem 1.25rem}
+
+  /* MAIN */
+  .main-wrap{flex:1;min-width:0;min-height:100vh;overflow-y:auto}
+  .main-content{max-width:860px;margin:0 auto;padding:2.5rem 2rem}
+  .section{display:none}
+  .section.active{display:block}
+  .section-intro{margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+  .section-intro h1{font-size:22px;font-weight:600;margin-bottom:6px;letter-spacing:-0.02em}
+  .section-intro p{color:var(--text-muted);font-size:13px;max-width:560px;line-height:1.7}
+
+  /* CARDS (events + attributes) */
+  .ev-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);margin-bottom:10px;overflow:hidden;transition:border-color 0.15s}
+  .ev-card:hover{border-color:var(--border-strong)}
+  .ev-header{padding:13px 18px;display:flex;align-items:center;gap:12px;cursor:pointer;user-select:none}
+  .ev-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+  .icon-green{background:var(--green-bg);color:var(--green)}
+  .icon-blue{background:var(--accent-bg);color:var(--accent)}
+  .icon-amber{background:var(--amber-bg);color:var(--amber)}
+  .icon-purple{background:var(--purple-bg);color:var(--purple)}
+  .icon-muted{background:rgba(255,255,255,0.04);color:var(--text-muted)}
+  .ev-info{flex:1;min-width:0}
+  .ev-name{font-family:var(--mono);font-size:13px;font-weight:500;color:var(--text)}
+  .ev-desc{font-size:12px;color:var(--text-muted);margin-top:1px}
+  .badge{font-size:10px;font-weight:600;letter-spacing:0.04em;padding:3px 8px;border-radius:4px;flex-shrink:0;font-family:var(--mono)}
+  .badge-green{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border)}
+  .badge-blue{background:var(--accent-bg);color:var(--accent);border:1px solid var(--accent-border)}
+  .badge-purple{background:var(--purple-bg);color:var(--purple);border:1px solid var(--purple-border)}
+  .badge-amber{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-border)}
+  .badge-muted{background:rgba(255,255,255,0.05);color:var(--text-muted);border:1px solid var(--border)}
+  .chevron{color:var(--text-dim);transition:transform 0.2s;font-size:11px;flex-shrink:0}
+  .ev-body{display:none;border-top:1px solid var(--border)}
+  .ev-body.open{display:block}
+
+  /* ALERTS */
+  .alert{margin:14px 18px;padding:10px 14px;border-radius:var(--radius);font-size:12px;line-height:1.6;border-left:2px solid}
+  .alert-blue{background:var(--accent-bg);color:#93c5fd;border-color:var(--accent)}
+  .alert-amber{background:var(--amber-bg);color:#fcd34d;border-color:var(--amber)}
+  .alert-green{background:var(--green-bg);color:#6ee7b7;border-color:var(--green)}
+  .banner{display:flex;align-items:flex-start;gap:10px;padding:12px 18px;border-bottom:1px solid var(--border);background:var(--amber-bg);font-size:12px;color:#fcd34d;line-height:1.5}
+
+  /* TABLES */
+  .prop-table-wrap{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:12.5px}
+  thead tr{background:rgba(255,255,255,0.02);border-bottom:1px solid var(--border)}
+  th{text-align:left;padding:8px 18px;font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-dim)}
+  td{padding:10px 18px;border-bottom:1px solid var(--border);vertical-align:top;color:var(--text)}
+  tr:last-child td{border-bottom:none}
+  tr:hover td{background:rgba(255,255,255,0.02)}
+  .prop-mono{font-family:var(--mono);font-size:12px;color:#93c5fd}
+  .prop-note{font-size:11px;color:var(--text-muted);margin-top:3px;line-height:1.5}
+  .prop-warn{font-size:11px;color:var(--amber);margin-top:3px}
+  .required-badge{display:inline-flex;align-items:center;font-size:10px;font-weight:600;padding:2px 6px;border-radius:4px;background:var(--red-bg);color:var(--red);border:1px solid rgba(245,101,101,0.25);white-space:nowrap}
+  code{font-family:var(--mono);font-size:11px;background:rgba(255,255,255,0.06);padding:1px 5px;border-radius:3px;color:#93c5fd}
+
+  /* SOLICITAÇÕES */
+  .btn-primary{padding:6px 16px;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--accent-border);background:var(--accent-bg);color:var(--accent);font-family:var(--sans);transition:all 0.15s}
+  .btn-primary:hover{background:rgba(79,142,247,0.2)}
+  .btn-ghost{padding:6px 14px;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--border-strong);background:transparent;color:var(--text-muted);font-family:var(--sans);transition:all 0.15s}
+  .btn-ghost:hover{color:var(--text);background:var(--bg-hover)}
+  .req-toolbar{display:flex;align-items:center;gap:8px;margin-bottom:1.5rem;flex-wrap:wrap;row-gap:8px}
+  .req-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);margin-bottom:10px;overflow:hidden;transition:border-color 0.15s}
+  .req-card:hover{border-color:var(--border-strong)}
+  .req-card-header{padding:12px 16px;display:flex;align-items:center;gap:10px}
+  .req-card-name{font-family:var(--mono);font-size:13px;color:var(--text);flex:1}
+  .req-type-badge{font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px;font-family:var(--mono)}
+  .req-type-evento{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border)}
+  .req-type-atributo{background:var(--accent-bg);color:var(--accent);border:1px solid var(--accent-border)}
+  .req-status{font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px;font-family:var(--mono);cursor:pointer;border:none}
+  .status-pendente{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-border)}
+  .status-em-andamento{background:var(--accent-bg);color:var(--accent);border:1px solid var(--accent-border)}
+  .status-concluido{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border)}
+  .btn-icon{width:28px;height:28px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;transition:all 0.12s}
+  .btn-icon:hover{background:var(--bg-hover);color:var(--text);border-color:var(--border-strong)}
+  .btn-icon.danger:hover{background:var(--red-bg);color:var(--red);border-color:rgba(245,101,101,0.3)}
+  .req-detail{border-top:1px solid var(--border);padding:10px 16px;font-size:12px;color:var(--text-muted)}
+  .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:1.5rem}
+  .stat-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px}
+  .stat-value{font-size:22px;font-weight:600;font-family:var(--mono);color:var(--text)}
+  .stat-label{font-size:11px;color:var(--text-muted);margin-top:2px}
+  .filter-tabs{display:flex;gap:4px;margin-bottom:1rem}
+  .ftab{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text-muted);font-family:var(--sans);transition:all 0.12s}
+  .ftab:hover{color:var(--text)}
+  .ftab.active{background:var(--bg-card);color:var(--text);border-color:var(--border-strong)}
+  .empty-state{text-align:center;padding:3rem 2rem;border:1px dashed var(--border);border-radius:var(--radius-lg);color:var(--text-dim);font-size:13px;line-height:2}
+  .empty-icon{font-size:28px;margin-bottom:8px}
+
+  /* MODAL */
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;display:flex;align-items:center;justify-content:center;padding:1rem}
+  .modal-overlay.hidden{display:none}
+  .modal{background:var(--bg-card);border:1px solid var(--border-strong);border-radius:var(--radius-lg);width:100%;max-width:520px;padding:1.5rem}
+  .modal h2{font-size:16px;font-weight:600;margin-bottom:1.25rem}
+  .form-group{margin-bottom:1rem}
+  .form-label{font-size:12px;color:var(--text-muted);margin-bottom:5px;display:block}
+  .form-input,.form-select,.form-textarea{width:100%;padding:8px 12px;border-radius:var(--radius);border:1px solid var(--border-strong);background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13px;outline:none;transition:border-color 0.15s}
+  .form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--accent)}
+  .form-textarea{resize:vertical;min-height:72px}
+  .form-select option{background:var(--bg-card)}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:1.25rem}
+
+  ::-webkit-scrollbar{width:6px;height:6px}
+  ::-webkit-scrollbar-track{background:transparent}
+  ::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:3px}
+  @media(max-width:768px){nav{display:none}.main-content{padding:1.5rem 1rem}.stats-row{grid-template-columns:1fr 1fr}.form-row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR NAV -->
+<nav>
+  <div class="nav-logo"><span class="logo-dot"></span>Braze Docs — Afya</div>
+
+  <div class="nav-section">
+    <span class="nav-section-label">Disponível na Braze</span>
+    <button class="nav-item active" onclick="showSection('eventos',this)"><span class="nav-dot"></span>Eventos</button>
+    <button class="nav-item" onclick="showSection('atributos',this)"><span class="nav-dot"></span>Atributos</button>
+  </div>
+
+  <div class="nav-divider"></div>
+
+  <div class="nav-section">
+    <span class="nav-section-label">Migração</span>
+    <button class="nav-item" onclick="showSection('solicitacoes',this)"><span class="nav-dot"></span>Solicitações</button>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main-wrap">
+<div class="main-content">
+
+  <!-- EVENTOS -->
+  <div id="section-eventos" class="section active">
+    <div class="section-intro">
+      <h1>Eventos</h1>
+      <p>Ações que registram comportamentos do usuário em momentos específicos. Podem disparar ou alimentar Canvas e campanhas. Clique em cada evento para ver as propriedades disponíveis.</p>
+    </div>
+
+    <div class="ev-card" id="ev-form">
+      <div class="ev-header" onclick="toggle(this)">
+        <div class="ev-icon icon-green">&#9632;</div>
+        <div class="ev-info"><div class="ev-name">form_submitted</div><div class="ev-desc">Conversão em landing page — Webflow, Unbounce ou Typeform</div></div>
+        <span class="badge badge-green">LP / Formulário</span><span class="chevron">&#9660;</span>
+      </div>
+      <div class="ev-body">
+        <div class="alert alert-blue"><strong>Typeform dispara duas vezes.</strong> Estratégia recomendada: triggetar no primeiro <code>form_submitted</code> e aguardar o evento de oportunidade como sinal de qualificação.</div>
+        <div class="prop-table-wrap"><table>
+          <thead><tr><th>Propriedade</th><th>Origem</th><th>Descrição e uso</th></tr></thead>
+          <tbody>
+            <tr><td><span class="prop-mono">insider_product_name</span></td><td><span class="badge badge-blue">Webflow</span></td><td>Identifica o produto/curso da LP. Regex parcial: <code>.*dermatologia.*</code></td></tr>
+            <tr><td><span class="prop-mono">insider_campaign_name</span></td><td><span class="badge badge-purple">Unbounce</span></td><td>Slug da URL da LP. Filtrar com contains ou regex.<div class="prop-note">Ex: <code>cap-internato-inteligente-r1</code></div></td></tr>
+            <tr><td><span class="prop-mono">salesforce_other_lead_sources</span></td><td><span class="badge badge-amber">Typeform</span></td><td>Identifica conversões Typeform. Regex: <code>(?i)Type\s?Form</code><div class="prop-warn">⚠ Valores inconsistentes — confirmar com time de páginas</div></td></tr>
+            <tr><td><span class="prop-mono">tag</span></td><td>—</td><td>Identificador de produto. Ex: <code>"Afya Papers"</code>, <code>"Preparatório"</code>.<div class="prop-note">Será a propriedade principal no Projeto Vendas Unificadas.</div></td></tr>
+            <tr><td><span class="prop-mono">interest</span></td><td>—</td><td>Interesse informado pelo usuário no formulário.</td></tr>
+            <tr><td><span class="prop-mono">typeform_form_title</span></td><td><span class="badge badge-amber">Typeform</span></td><td>Título do formulário — útil para identificar qual formulário gerou a conversão.</td></tr>
+            <tr><td><span class="prop-mono">landing_page_url</span></td><td>—</td><td>URL completa da LP. Usar como <strong>fallback</strong> quando outras propriedades estiverem vazias. Filtrar com contains ou regex para capturar variações de UTM.</td></tr>
+            <tr><td><span class="prop-mono">lp_educon_name</span></td><td>—</td><td>Nome informado na LP.</td></tr>
+            <tr><td><span class="prop-mono">lp_educon_phone</span></td><td>—</td><td>Telefone informado — fonte do disparo de WhatsApp via Blip.</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <div class="ev-card" id="ev-created">
+      <div class="ev-header" onclick="toggle(this)">
+        <div class="ev-icon icon-blue">&#9670;</div>
+        <div class="ev-info"><div class="ev-name">opportunity_created</div><div class="ev-desc">Nova oportunidade criada no Salesforce</div></div>
+        <span class="badge badge-blue">Salesforce</span><span class="chevron">&#9660;</span>
+      </div>
+      <div class="ev-body">
+        <div class="alert alert-amber"><strong>Filtros obrigatórios:</strong> sempre filtrar por <code>application_name = "salesforce"</code> e <code>application_feature = "opportunity_management"</code>.</div>
+        <div class="prop-table-wrap"><table>
+          <thead><tr><th>Propriedade</th><th></th><th>Descrição e uso</th></tr></thead>
+          <tbody>
+            <tr><td><span class="prop-mono">application_name</span></td><td><span class="required-badge">obrigatório</span></td><td>Valor fixo: <code>"salesforce"</code>.</td></tr>
+            <tr><td><span class="prop-mono">application_feature</span></td><td><span class="required-badge">obrigatório</span></td><td>Valor fixo: <code>"opportunity_management"</code>.</td></tr>
+            <tr><td><span class="prop-mono">opportunity_id</span></td><td>—</td><td>ID da oportunidade que gerou o evento. Use para localizar o objeto no <code>opportunity_array</code>.</td></tr>
+            <tr><td><span class="prop-mono">opportunity_stage</span></td><td>—</td><td>Fase da oportunidade no momento da criação.<div class="prop-warn">⚠ Catálogo completo de fases pendente com engenharia</div></td></tr>
+            <tr><td><span class="prop-mono">tag</span></td><td>—</td><td>Produto da oportunidade. Ex: <code>"Pós-Graduação"</code>, <code>"Preparatório"</code>.</td></tr>
+            <tr><td><span class="prop-mono">courses</span></td><td>—</td><td>Curso associado. Pode vir vazio — usar condicional em Liquid.</td></tr>
+            <tr><td><span class="prop-mono">has_open_opportunities</span></td><td>—</td><td>Indica se o lead tem outras oportunidades em aberto.</td></tr>
+            <tr><td><span class="prop-mono">has_won_opportunities_last_12_months</span></td><td>—</td><td>Indica se já converteu nos últimos 12 meses.</td></tr>
+            <tr><td><span class="prop-mono">opportunity_array</span></td><td>—</td><td>Histórico completo de oportunidades da conta.</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <div class="ev-card" id="ev-updated">
+      <div class="ev-header" onclick="toggle(this)">
+        <div class="ev-icon icon-blue">&#9670;</div>
+        <div class="ev-info"><div class="ev-name">opportunity_updated</div><div class="ev-desc">Oportunidade atualizada no Salesforce</div></div>
+        <span class="badge badge-blue">Salesforce</span><span class="chevron">&#9660;</span>
+      </div>
+      <div class="ev-body">
+        <div class="alert alert-blue"><code>loss_reason</code> e <code>loss_sub_reason</code> já aparecem neste evento — útil para reagir antes do fechamento oficial como perdida.</div>
+        <div class="prop-table-wrap"><table>
+          <thead><tr><th>Propriedade</th><th></th><th>Descrição e uso</th></tr></thead>
+          <tbody>
+            <tr><td><span class="prop-mono">application_name</span></td><td><span class="required-badge">obrigatório</span></td><td>Valor fixo: <code>"salesforce"</code>.</td></tr>
+            <tr><td><span class="prop-mono">application_feature</span></td><td><span class="required-badge">obrigatório</span></td><td>Valor fixo: <code>"opportunity_management"</code>.</td></tr>
+            <tr><td><span class="prop-mono">opportunity_id</span></td><td>—</td><td>ID da oportunidade atualizada.</td></tr>
+            <tr><td><span class="prop-mono">opportunity_stage</span></td><td>—</td><td>Nova fase após a atualização.</td></tr>
+            <tr><td><span class="prop-mono">loss_reason</span></td><td>—</td><td>Motivo de perda.<div class="prop-warn">⚠ Valores possíveis não catalogados — confirmar com engenharia</div></td></tr>
+            <tr><td><span class="prop-mono">loss_sub_reason</span></td><td>—</td><td>Submotivo — detalhamento do motivo principal.</td></tr>
+            <tr><td><span class="prop-mono">has_open_opportunities</span></td><td>—</td><td>Indica se ainda há oportunidades em aberto.</td></tr>
+            <tr><td><span class="prop-mono">opportunity_array</span></td><td>—</td><td>Histórico completo de oportunidades da conta.</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <div class="ev-card" id="ev-lost">
+      <div class="ev-header" onclick="toggle(this)">
+        <div class="ev-icon icon-amber">&#9650;</div>
+        <div class="ev-info"><div class="ev-name">opportunity_lost</div><div class="ev-desc">Oportunidade marcada como perdida no Salesforce</div></div>
+        <span class="badge badge-amber">Salesforce</span><span class="chevron">&#9660;</span>
+      </div>
+      <div class="ev-body">
+        <div class="alert alert-green"><strong>Dica:</strong> ramifique o Canvas por <code>loss_reason</code> para enviar comunicações diferentes por motivo de perda.</div>
+        <div class="prop-table-wrap"><table>
+          <thead><tr><th>Propriedade</th><th></th><th>Descrição e uso</th></tr></thead>
+          <tbody>
+            <tr><td><span class="prop-mono">application_name</span></td><td><span class="required-badge">obrigatório</span></td><td>Valor fixo: <code>"salesforce"</code>.</td></tr>
+            <tr><td><span class="prop-mono">application_feature</span></td><td><span class="required-badge">obrigatório</span></td><td>Valor fixo: <code>"opportunity_management"</code>.</td></tr>
+            <tr><td><span class="prop-mono">opportunity_id</span></td><td>—</td><td>ID da oportunidade perdida.</td></tr>
+            <tr><td><span class="prop-mono">opportunity_stage</span></td><td>—</td><td>Fase no momento da perda.</td></tr>
+            <tr><td><span class="prop-mono">loss_reason</span></td><td>—</td><td><strong>Motivo principal da perda.</strong> Principal propriedade para ramificação.<div class="prop-warn">⚠ Valores possíveis não catalogados — confirmar com engenharia</div></td></tr>
+            <tr><td><span class="prop-mono">loss_sub_reason</span></td><td>—</td><td>Submotivo — permite ramificações mais específicas.</td></tr>
+            <tr><td><span class="prop-mono">has_open_opportunities</span></td><td>—</td><td>Indica se ainda há outras oportunidades em aberto.</td></tr>
+            <tr><td><span class="prop-mono">opportunity_array</span></td><td>—</td><td>Histórico completo de oportunidades da conta.</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <div class="ev-card" id="ev-won">
+      <div class="ev-header" onclick="toggle(this)">
+        <div class="ev-icon icon-green">&#9679;</div>
+        <div class="ev-info"><div class="ev-name">opportunity_won</div><div class="ev-desc">Oportunidade marcada como ganha no Salesforce</div></div>
+        <span class="badge badge-green">Salesforce</span><span class="chevron">&#9660;</span>
+      </div>
+      <div class="ev-body">
+        <div class="prop-table-wrap"><table>
+          <thead><tr><th>Propriedade</th><th></th><th>Descrição e uso</th></tr></thead>
+          <tbody>
+            <tr><td><span class="prop-mono">application_name</span></td><td><span class="required-badge">obrigatório</span></td><td>Valor fixo: <code>"salesforce"</code>.</td></tr>
+            <tr><td><span class="prop-mono">application_feature</span></td><td><span class="required-badge">obrigatório</span></td><td>Valor fixo: <code>"opportunity_management"</code>.</td></tr>
+            <tr><td><span class="prop-mono">opportunity_id</span></td><td>—</td><td>ID da oportunidade ganha.</td></tr>
+            <tr><td><span class="prop-mono">opportunity_stage</span></td><td>—</td><td>Fase no momento da vitória.</td></tr>
+            <tr><td><span class="prop-mono">courses</span></td><td>—</td><td>Curso associado — usar para personalizar comunicação pós-venda.</td></tr>
+            <tr><td><span class="prop-mono">has_won_opportunities_last_12_months</span></td><td>—</td><td>Confirmação de vitória recente.</td></tr>
+            <tr><td><span class="prop-mono">opportunity_array</span></td><td>—</td><td>Histórico completo de oportunidades da conta.</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ATRIBUTOS -->
+  <div id="section-atributos" class="section">
+    <div class="section-intro">
+      <h1>Atributos</h1>
+      <p>Características persistentes do perfil do usuário. Usados para segmentação e personalização. Atributos <code>cdp_*</code> e <code>salesforce_*</code> nunca devem ser sobrescritos em Canvas.</p>
+    </div>
+
+    <!-- Perfil Profissional -->
+    <div class="ev-card">
+      <div class="ev-header" onclick="toggle(this)">
+        <div class="ev-icon icon-purple">&#9670;</div>
+        <div class="ev-info"><div class="ev-name">Perfil Profissional</div><div class="ev-desc">Especialidade médica, registro CRM, dados profissionais</div></div>
+        <span class="badge badge-muted">4 atributos</span><span class="chevron">&#9660;</span>
+      </div>
+      <div class="ev-body">
+        <div class="prop-table-wrap"><table>
+          <thead><tr><th>Atributo</th><th>Tipo</th><th>Descrição</th></tr></thead>
+          <tbody>
+            <tr><td><span class="prop-mono">cdp_cfm_specialty</span></td><td><span class="badge badge-muted">string</span></td><td>Especialidade médica principal registrada no CFM.</td></tr>
+            <tr><td><span class="prop-mono">cdp_cfm_uf</span></td><td><span class="badge badge-muted">string</span></td><td>Estado(s) de registro médico — útil para segmentação geográfica.</td></tr>
+            <tr><td><span class="prop-mono">cdp_is_doctor</span></td><td><span class="badge badge-muted">number</span></td><td>Indica se é médico registrado em CRM. Armazenado como 0/1.<div class="prop-warn">⚠ Nomenclatura e tipo pendentes de revisão</div></td></tr>
+            <tr><td><span class="prop-mono">cdp_crm_enrichment</span></td><td><span class="badge badge-muted">array</span></td><td>Dados completos do CRM estadual — nome, número, UF, especialidades, status. Um médico pode ter registros em múltiplos CRMs.</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- Produtos Afya -->
+    <div class="ev-card">
+      <div class="ev-header" onclick="toggle(this)">
+        <div class="ev-icon icon-blue">&#9632;</div>
+        <div class="ev-info"><div class="ev-name">Relação com Produtos Afya</div><div class="ev-desc">Cadastro e relação comercial com produtos do ecossistema</div></div>
+        <span class="badge badge-muted">8 atributos</span><span class="chevron">&#9660;</span>
+      </div>
+      <div class="ev-body">
+        <div class="banner"><span>⚠</span><span>Atributos <code>cdp_customer_*</code> são propagados para todos os perfis da mesma pessoa — risco de comunicação duplicada. Atributos <code>cdp_has_*</code> são vinculados ao e-mail específico.</span></div>
+        <div class="prop-table-wrap"><table>
+          <thead><tr><th>Atributo</th><th>Tipo</th><th>Descrição</th></tr></thead>
+          <tbody>
+            <tr><td><span class="prop-mono">cdp_customer_afya_pos_grad</span></td><td><span class="badge badge-muted">boolean</span></td><td>Matriculado ativamente em Pós-Graduação.</td></tr>
+            <tr><td><span class="prop-mono">cdp_customer_whitebook</span></td><td><span class="badge badge-muted">string</span></td><td>Relação comercial com Whitebook. Propagado para todos os perfis da mesma pessoa.</td></tr>
+            <tr><td><span class="prop-mono">cdp_customer_iclinic</span></td><td><span class="badge badge-muted">string</span></td><td>Relação comercial com iClinic. Propagado para todos os perfis da mesma pessoa.</td></tr>
+            <tr><td><span class="prop-mono">cdp_has_whitebook_account</span></td><td><span class="badge badge-muted">boolean</span></td><td>Este e-mail específico tem cadastro no Whitebook.</td></tr>
+            <tr><td><span class="prop-mono">cdp_has_iclinic_account</span></td><td><span class="badge badge-muted">boolean</span></td><td>Este e-mail específico tem cadastro no iClinic.</td></tr>
+            <tr><td><span class="prop-mono">cdp_has_portalafya_account</span></td><td><span class="badge badge-muted">boolean</span></td><td>Este e-mail específico tem cadastro no Portal Afya.</td></tr>
+            <tr><td><span class="prop-mono">cdp_has_prescription_account</span></td><td><span class="badge badge-muted">boolean</span></td><td>Este e-mail específico tem cadastro no ReceitaPro.</td></tr>
+            <tr><td><span class="prop-mono">cdp_has_shosp_account</span></td><td><span class="badge badge-muted">boolean</span></td><td>Este e-mail específico tem cadastro no Shosp.</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- Histórico Acadêmico -->
+    <div class="ev-card">
+      <div class="ev-header" onclick="toggle(this)">
+        <div class="ev-icon icon-green">&#9679;</div>
+        <div class="ev-info"><div class="ev-name">Histórico Acadêmico</div><div class="ev-desc">Matrículas ativas, cursos concluídos, data de matrícula</div></div>
+        <span class="badge badge-muted">4 atributos</span><span class="chevron">&#9660;</span>
+      </div>
+      <div class="ev-body">
+        <div class="prop-table-wrap"><table>
+          <thead><tr><th>Atributo</th><th>Tipo</th><th>Descrição</th></tr></thead>
+          <tbody>
+            <tr><td><span class="prop-mono">cdp_student_unity_course</span></td><td><span class="badge badge-muted">array</span></td><td>Matrículas ativas — array de objetos com <code>course</code> e <code>unit</code>.</td></tr>
+            <tr><td><span class="prop-mono">cdp_alumni_unity_course</span></td><td><span class="badge badge-muted">array</span></td><td>Cursos concluídos — array de objetos com <code>course</code> e <code>unit</code>.</td></tr>
+            <tr><td><span class="prop-mono">cdp_alumni</span></td><td><span class="badge badge-muted">boolean</span></td><td>Ex-aluno de algum curso de Pós-Graduação.</td></tr>
+            <tr><td><span class="prop-mono">cdp_enrollment_date</span></td><td><span class="badge badge-muted">timestamp</span></td><td>Data mais recente de atualização entre todos os contratos.<div class="prop-warn">⚠ Comportamento exato a confirmar com engenharia</div></td></tr>
+          </tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- Pipeline Salesforce -->
+    <div class="ev-card">
+      <div class="ev-header" onclick="toggle(this)">
+        <div class="ev-icon icon-amber">&#9650;</div>
+        <div class="ev-info"><div class="ev-name">Pipeline Salesforce</div><div class="ev-desc">Oportunidades, fases e histórico comercial</div></div>
+        <span class="badge badge-muted">7 atributos</span><span class="chevron">&#9660;</span>
+      </div>
+      <div class="ev-body">
+        <div class="banner"><span>⚠</span><span><code>salesforce_opportunity_array</code> não dispara entrada em Canvas. Use os custom events de oportunidade ou os atributos flat abaixo para acionar fluxos.</span></div>
+        <div class="prop-table-wrap"><table>
+          <thead><tr><th>Atributo</th><th>Tipo</th><th>Descrição</th></tr></thead>
+          <tbody>
+            <tr><td><span class="prop-mono">salesforce_has_open_opportunities</span></td><td><span class="badge badge-muted">boolean</span></td><td>Tem oportunidade em aberto — ideal para ramificação em Canvas.</td></tr>
+            <tr><td><span class="prop-mono">salesforce_has_won_opportunities_last_12_months</span></td><td><span class="badge badge-muted">boolean</span></td><td>Ganhou oportunidade nos últimos 12 meses.</td></tr>
+            <tr><td><span class="prop-mono">salesforce_last_opportunity_stage</span></td><td><span class="badge badge-muted">string</span></td><td>Fase atual da última oportunidade — usar para ramificação sem precisar acessar o array.</td></tr>
+            <tr><td><span class="prop-mono">salesforce_last_opportunity_courses</span></td><td><span class="badge badge-muted">string</span></td><td>Cursos da última oportunidade.<div class="prop-warn">⚠ Tipo e comportamento a confirmar com engenharia</div></td></tr>
+            <tr><td><span class="prop-mono">salesforce_last_opportunity_created_date</span></td><td><span class="badge badge-muted">timestamp</span></td><td>Data de criação da última oportunidade.</td></tr>
+            <tr><td><span class="prop-mono">salesforce_last_opportunity_update_date</span></td><td><span class="badge badge-muted">timestamp</span></td><td>Data da última atualização de oportunidade.</td></tr>
+            <tr><td><span class="prop-mono">salesforce_opportunity_array</span></td><td><span class="badge badge-muted">array</span></td><td>Histórico completo de oportunidades. Não sobrescrever em Canvas — origem externa.</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- Dados de LP -->
+    <div class="ev-card">
+      <div class="ev-header" onclick="toggle(this)">
+        <div class="ev-icon icon-muted">&#9632;</div>
+        <div class="ev-info"><div class="ev-name">Dados de LP</div><div class="ev-desc">Informações cadastrais capturadas em formulários de landing page</div></div>
+        <span class="badge badge-muted">3 atributos</span><span class="chevron">&#9660;</span>
+      </div>
+      <div class="ev-body">
+        <div class="prop-table-wrap"><table>
+          <thead><tr><th>Atributo</th><th>Tipo</th><th>Descrição</th></tr></thead>
+          <tbody>
+            <tr><td><span class="prop-mono">lp_educon_name</span></td><td><span class="badge badge-muted">string</span></td><td>Nome informado na LP — dados não validados, usar como fallback para personalização.</td></tr>
+            <tr><td><span class="prop-mono">lp_educon_phone</span></td><td><span class="badge badge-muted">string</span></td><td>Telefone informado na LP — fonte principal para WhatsApp via Blip. Não usar o atributo padrão <code>phone</code> como fallback.</td></tr>
+            <tr><td><span class="prop-mono">lp_educon_occupation</span></td><td><span class="badge badge-muted">string</span></td><td>Ocupação informada pelo usuário na LP.</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SOLICITAÇÕES -->
+  <div id="section-solicitacoes" class="section">
+    <div class="section-intro">
+      <h1>Solicitações</h1>
+      <p>Registre aqui eventos e atributos que ainda não estão disponíveis na Braze e precisam ser mapeados ou criados. Cada solicitação fica vinculada a uma BU e tem um status de acompanhamento.</p>
+    </div>
+
+    <!-- ROTEIRO DE RACIOCÍNIO -->
+    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);margin-bottom:1.5rem;overflow:hidden;">
+      <div style="padding:12px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.02);">
+        <span style="font-size:14px;">💡</span>
+        <span style="font-size:12px;font-weight:600;color:var(--text);">Roteiro de raciocínio — para não deixar nada faltando</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);border-bottom:0;">
+        <div style="padding:14px 18px;border-right:1px solid var(--border);">
+          <div style="font-size:11px;font-weight:600;color:var(--accent);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.05em;">Disparos pontuais</div>
+          <div style="font-size:12px;color:var(--text-muted);line-height:1.7;">Que mensagem pontual você precisaria mandar? Qual evento dispara esse envio?<div style="margin-top:6px;font-size:11px;color:var(--text-dim);">Ex: lead preencheu formulário da LP, oportunidade foi perdida no Salesforce.</div></div>
+        </div>
+        <div style="padding:14px 18px;border-right:1px solid var(--border);">
+          <div style="font-size:11px;font-weight:600;color:var(--purple);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.05em;">Canvas (jornadas automáticas)</div>
+          <div style="font-size:12px;color:var(--text-muted);line-height:1.7;">Que fluxo automatizado você quer recriar ou criar do zero? Quais são os passos, ramificações e condições?<div style="margin-top:6px;font-size:11px;color:var(--text-dim);">Que eventos entram e que atributos filtram cada etapa?</div></div>
+        </div>
+        <div style="padding:14px 18px;">
+          <div style="font-size:11px;font-weight:600;color:var(--green);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.05em;">Segmentações</div>
+          <div style="font-size:12px;color:var(--text-muted);line-height:1.7;">Que filtro você usaria para extrair um público específico?<div style="margin-top:6px;font-size:11px;color:var(--text-dim);">Ex: médicos especialistas com oportunidade aberta há mais de 30 dias, sem interação no WhatsApp.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="req-toolbar">
+      <div class="filter-tabs">
+        <button class="ftab active" onclick="setFilter('tipo','todos',this)">Todos</button>
+        <button class="ftab" onclick="setFilter('tipo','evento',this)">Eventos</button>
+        <button class="ftab" onclick="setFilter('tipo','atributo',this)">Atributos</button>
+      </div>
+      <div class="filter-tabs">
+        <button class="ftab active" onclick="setFilter('bu','todas',this)">Todas as BUs</button>
+        <button class="ftab" onclick="setFilter('bu','Residência',this)">Residência</button>
+        <button class="ftab" onclick="setFilter('bu','IPEMED',this)">IPEMED</button>
+        <button class="ftab" onclick="setFilter('bu','Afya Papers',this)">Afya Papers</button>
+      </div>
+      <button class="btn-primary" style="margin-left:auto" onclick="openModal()">+ Nova solicitação</button>
+    </div>
+
+    <div id="req-list"></div>
+    <div id="req-empty" class="empty-state" style="display:none">
+      <div class="empty-icon">📋</div>
+      Nenhuma solicitação registrada ainda.<br>
+      Clique em <strong>+ Nova solicitação</strong> para começar.
+
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay hidden" id="modal-overlay" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <h2 id="modal-title">Nova solicitação</h2>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Tipo</label>
+        <select class="form-select" id="f-tipo"><option value="evento">Evento</option><option value="atributo">Atributo</option></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">BU</label>
+        <select class="form-select" id="f-bu"><option value="Residência">Residência</option><option value="IPEMED">IPEMED</option><option value="Afya Papers">Afya Papers</option></select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Nome do evento / atributo</label>
+      <input class="form-input" id="f-nome" type="text" placeholder="ex: course_started, cdp_lead_score" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Descrição e contexto de uso</label>
+      <textarea class="form-textarea" id="f-desc" placeholder="Para que serve? Em qual Canvas ou campanha vai ser usado?"></textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Solicitante</label>
+        <input class="form-input" id="f-solicitante" type="text" placeholder="Seu nome" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <select class="form-select" id="f-status"><option value="a-solicitar">🔴 A solicitar</option><option value="aguardando">⏳ Aguardando</option><option value="em-alinhamento">🔄 Em alinhamento</option><option value="a-testar">🟡 A testar</option></select>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="closeModal()">Cancelar</button>
+      <button class="btn-primary" onclick="saveReq()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<script id="__req_data__" type="application/json">[]</script>
+<!-- TOAST -->
+<div id="toast" style="position:fixed;bottom:1.5rem;right:1.5rem;padding:10px 16px;border-radius:8px;font-size:13px;border:1px solid;opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:2000;font-family:var(--sans)"></div>
+<style>
+  #toast.show{opacity:1}
+  .status-a-solicitar{background:var(--red-bg);color:var(--red);border:1px solid rgba(245,101,101,0.3)}
+  .status-aguardando{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-border)}
+  .status-em-alinhamento{background:var(--accent-bg);color:var(--accent);border:1px solid var(--accent-border)}
+  .status-a-testar{background:rgba(234,211,70,0.12);color:#d4ac0d;border:1px solid rgba(234,211,70,0.3)}
+</style>
+<script>
+  const SUPA_URL='https://xwnejtcalijgaaosdici.supabase.co';
+  const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh3bmVqdGNhbGlqZ2Fhb3NkaWNpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzODkwMjEsImV4cCI6MjA5NTk2NTAyMX0.9SfR253EzCY4Ky6EJFIudcgf_coXeQPsZ_COd8U5EYI';
+
+  async function sbFetch(path,opts={}){
+    const res=await fetch(SUPA_URL+'/rest/v1/'+path,{
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=representation',...(opts.headers||{})},
+      ...opts
+    });
+    if(!res.ok){const e=await res.text();throw new Error(e)}
+    const ct=res.headers.get('content-type')||'';
+    return ct.includes('json')?res.json():null;
+  }
+
+  let requests=[];let editingId=null;let filters={tipo:'todos',bu:'todas'};
+
+  const STATUS_ORDER=['a-solicitar','aguardando','em-alinhamento','a-testar'];
+  const STATUS_LABEL={'a-solicitar':'🔴 A solicitar','aguardando':'⏳ Aguardando','em-alinhamento':'🔄 Em alinhamento','a-testar':'🟡 A testar'};
+  const STATUS_CLASS={'a-solicitar':'status-a-solicitar','aguardando':'status-aguardando','em-alinhamento':'status-em-alinhamento','a-testar':'status-a-testar'};
+
+  function showSection(id,btn){
+    document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(t=>t.classList.remove('active'));
+    document.getElementById('section-'+id).classList.add('active');
+    btn.classList.add('active');
+    if(id==='solicitacoes')loadRequests();
+  }
+
+  function toggle(header){
+    const body=header.nextElementSibling;
+    const chevron=header.querySelector('.chevron');
+    const isOpen=body.classList.contains('open');
+    body.classList.toggle('open',!isOpen);
+    chevron.style.transform=isOpen?'':'rotate(180deg)';
+  }
+
+  function setFilter(key,val,btn){
+    filters[key]=val;
+    if(btn){btn.parentNode.querySelectorAll('.ftab').forEach(t=>t.classList.remove('active'));btn.classList.add('active')}
+    renderList();
+  }
+
+  async function loadRequests(){
+    const list=document.getElementById('req-list');
+    list.innerHTML='<div style="text-align:center;padding:2rem;color:var(--text-dim);font-size:13px;">Carregando...</div>';
+    try{
+      const data=await sbFetch('solicitacoes?select=*&order=criado_em.desc');
+      requests=(data||[]).map(r=>({
+        id:r.id,tipo:r.tipo,bu:r.bu,nome:r.nome,
+        desc:r.descricao||'',solicitante:r.solicitante||'',
+        status:r.status,
+        data:r.criado_em?new Date(r.criado_em).toLocaleDateString('pt-BR'):''
+      }));
+      renderList();
+    }catch(e){
+      list.innerHTML='';
+      showToast('Erro ao carregar: '+e.message,'error');
+    }
+  }
+
+  function renderList(){
+    const list=document.getElementById('req-list');
+    const empty=document.getElementById('req-empty');
+    let filtered=requests.filter(r=>{
+      if(filters.tipo!=='todos'&&r.tipo!==filters.tipo)return false;
+      if(filters.bu!=='todas'&&r.bu!==filters.bu)return false;
+      return true;
+    });
+    if(filtered.length===0){list.innerHTML='';empty.style.display='';return}
+    empty.style.display='none';
+    list.innerHTML=filtered.map(r=>`
+      <div class="req-card">
+        <div class="req-card-header">
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+              <span class="req-type-badge req-type-${r.tipo}">${r.tipo}</span>
+              <span class="req-card-name">${r.nome}</span>
+            </div>
+            <div style="display:flex;gap:12px;flex-wrap:wrap">
+              <span style="font-size:11px;color:var(--text-dim)">BU: <span style="color:var(--text-muted)">${r.bu}</span></span>
+              <span style="font-size:11px;color:var(--text-dim)">Por: <span style="color:var(--text-muted)">${r.solicitante||'—'}</span></span>
+              <span style="font-size:11px;color:var(--text-dim)">${r.data}</span>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+            <button class="req-status ${STATUS_CLASS[r.status]}" onclick="cycleStatus('${r.id}')" title="Clique para avançar">${STATUS_LABEL[r.status]}</button>
+            <button class="btn-icon" onclick="openModal('${r.id}')" title="Editar">✎</button>
+            <button class="btn-icon danger" onclick="deleteReq('${r.id}')" title="Remover">✕</button>
+          </div>
+        </div>
+        ${r.desc?`<div class="req-detail">${r.desc}</div>`:''}
+      </div>`).join('');
+  }
+
+  function openModal(id){
+    editingId=id||null;
+    document.getElementById('modal-title').textContent=id?'Editar solicitação':'Nova solicitação';
+    if(id){
+      const r=requests.find(r=>r.id===id);
+      document.getElementById('f-tipo').value=r.tipo;
+      document.getElementById('f-bu').value=r.bu;
+      document.getElementById('f-nome').value=r.nome;
+      document.getElementById('f-desc').value=r.desc||'';
+      document.getElementById('f-solicitante').value=r.solicitante||'';
+      document.getElementById('f-status').value=r.status;
+    }else{
+      document.getElementById('f-tipo').value='evento';
+      document.getElementById('f-bu').value='Residência';
+      document.getElementById('f-nome').value='';
+      document.getElementById('f-desc').value='';
+      document.getElementById('f-status').value='a-solicitar';
+      document.getElementById('f-solicitante').value=requests.length?requests[0].solicitante:'';
+    }
+    document.getElementById('modal-overlay').classList.remove('hidden');
+    setTimeout(()=>document.getElementById('f-nome').focus(),50);
+  }
+
+  function closeModal(){document.getElementById('modal-overlay').classList.add('hidden');editingId=null}
+  function closeModalOutside(e){if(e.target===document.getElementById('modal-overlay'))closeModal()}
+
+  async function saveReq(){
+    const nome=document.getElementById('f-nome').value.trim();
+    if(!nome){document.getElementById('f-nome').focus();return}
+    const btn=document.querySelector('.modal-actions .btn-primary');
+    btn.textContent='Salvando...';btn.disabled=true;
+    const payload={
+      tipo:document.getElementById('f-tipo').value,
+      bu:document.getElementById('f-bu').value,
+      nome,
+      descricao:document.getElementById('f-desc').value.trim(),
+      solicitante:document.getElementById('f-solicitante').value.trim(),
+      status:document.getElementById('f-status').value
+    };
+    try{
+      if(editingId){
+        await sbFetch('solicitacoes?id=eq.'+editingId,{method:'PATCH',body:JSON.stringify(payload)});
+      }else{
+        await sbFetch('solicitacoes',{method:'POST',body:JSON.stringify({id:'req_'+Date.now(),...payload})});
+      }
+      closeModal();
+      await loadRequests();
+      showToast(editingId?'Solicitação atualizada!':'Solicitação criada!');
+    }catch(e){
+      showToast('Erro ao salvar: '+e.message,'error');
+    }finally{
+      btn.textContent='Salvar';btn.disabled=false;
+    }
+  }
+
+  async function deleteReq(id){
+    if(!confirm('Remover esta solicitação?'))return;
+    try{
+      await sbFetch('solicitacoes?id=eq.'+id,{method:'DELETE'});
+      await loadRequests();
+      showToast('Solicitação removida.');
+    }catch(e){showToast('Erro ao remover: '+e.message,'error')}
+  }
+
+  async function cycleStatus(id){
+    const r=requests.find(r=>r.id===id);
+    const next=STATUS_ORDER[(STATUS_ORDER.indexOf(r.status)+1)%STATUS_ORDER.length];
+    try{
+      await sbFetch('solicitacoes?id=eq.'+id,{method:'PATCH',body:JSON.stringify({status:next})});
+      r.status=next;
+      renderList();
+    }catch(e){showToast('Erro ao atualizar status: '+e.message,'error')}
+  }
+
+  function showToast(msg,type='success'){
+    const t=document.getElementById('toast');
+    t.textContent=msg;
+    t.style.background=type==='error'?'var(--red-bg)':'var(--green-bg)';
+    t.style.color=type==='error'?'var(--red)':'var(--green)';
+    t.style.borderColor=type==='error'?'var(--red)':'var(--green)';
+    t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'),3000);
+  }
+
+  loadRequests();
+</script>
+</body>
+</html>
