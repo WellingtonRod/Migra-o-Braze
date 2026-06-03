@@ -157,6 +157,8 @@
   <div class="nav-section">
     <span class="nav-section-label">Migração</span>
     <button class="nav-item" onclick="showSection('solicitacoes',this)"><span class="nav-dot"></span>Solicitações</button>
+    <button class="nav-item" onclick="showSection('validado',this)"><span class="nav-dot"></span>Validado</button>
+    <button class="nav-item" onclick="showSection('truncado',this)"><span class="nav-dot"></span>Truncado</button>
   </div>
 </nav>
 
@@ -461,6 +463,75 @@
     </div>
   </div>
 
+  <!-- VALIDADO -->
+  <div id="section-validado" class="section">
+    <div class="section-intro">
+      <h1>Validado</h1>
+      <p>Eventos, atributos e features testados e confirmados como funcionais na Braze. Sirva como referência antes de replicar em novos Canvas ou campanhas.</p>
+    </div>
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-value" id="val-stat-total">—</div><div class="stat-label">Total validado</div></div>
+      <div class="stat-card"><div class="stat-value" id="val-stat-evento">—</div><div class="stat-label">Eventos</div></div>
+      <div class="stat-card"><div class="stat-value" id="val-stat-atributo">—</div><div class="stat-label">Atributos</div></div>
+      <div class="stat-card"><div class="stat-value" id="val-stat-feature">—</div><div class="stat-label">Features</div></div>
+    </div>
+    <div class="req-toolbar">
+      <div class="filter-tabs">
+        <button class="ftab active" onclick="setValFilter('tipo','todos',this)">Todos</button>
+        <button class="ftab" onclick="setValFilter('tipo','evento',this)">Eventos</button>
+        <button class="ftab" onclick="setValFilter('tipo','atributo',this)">Atributos</button>
+        <button class="ftab" onclick="setValFilter('tipo','feature',this)">Features</button>
+      </div>
+      <div class="filter-tabs">
+        <button class="ftab active" onclick="setValFilter('bu','todas',this)">Todos os Produtos</button>
+        <button class="ftab" onclick="setValFilter('bu','Residência',this)">Residência</button>
+        <button class="ftab" onclick="setValFilter('bu','IPEMED',this)">IPEMED</button>
+        <button class="ftab" onclick="setValFilter('bu','Afya Papers',this)">Afya Papers</button>
+      </div>
+      <button class="btn-primary" style="margin-left:auto" onclick="openValModal()">+ Registrar validação</button>
+    </div>
+    <div id="val-list"></div>
+    <div id="val-empty" class="empty-state" style="display:none">
+      <div class="empty-icon">✅</div>
+      Nenhuma validação registrada ainda.<br>
+      Clique em <strong>+ Registrar validação</strong> para começar.
+    </div>
+  </div>
+
+  <!-- TRUNCADO -->
+  <div id="section-truncado" class="section">
+    <div class="section-intro">
+      <h1>Truncado</h1>
+      <p>Eventos e atributos testados cujo comportamento não correspondeu ao esperado. Documente o desvio para evitar retrabalho entre os analistas.</p>
+    </div>
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-value" id="trun-stat-total">—</div><div class="stat-label">Total reportado</div></div>
+      <div class="stat-card"><div class="stat-value" id="trun-stat-reportado">—</div><div class="stat-label">A investigar</div></div>
+      <div class="stat-card"><div class="stat-value" id="trun-stat-em-analise">—</div><div class="stat-label">Em análise</div></div>
+      <div class="stat-card"><div class="stat-value" id="trun-stat-resolvido">—</div><div class="stat-label">Resolvidos</div></div>
+    </div>
+    <div class="req-toolbar">
+      <div class="filter-tabs">
+        <button class="ftab active" onclick="setTrunFilter('tipo','todos',this)">Todos</button>
+        <button class="ftab" onclick="setTrunFilter('tipo','evento',this)">Eventos</button>
+        <button class="ftab" onclick="setTrunFilter('tipo','atributo',this)">Atributos</button>
+      </div>
+      <div class="filter-tabs">
+        <button class="ftab active" onclick="setTrunFilter('bu','todas',this)">Todos os Produtos</button>
+        <button class="ftab" onclick="setTrunFilter('bu','Residência',this)">Residência</button>
+        <button class="ftab" onclick="setTrunFilter('bu','IPEMED',this)">IPEMED</button>
+        <button class="ftab" onclick="setTrunFilter('bu','Afya Papers',this)">Afya Papers</button>
+      </div>
+      <button class="btn-primary" style="margin-left:auto" onclick="openTrunModal()">+ Reportar desvio</button>
+    </div>
+    <div id="trun-list"></div>
+    <div id="trun-empty" class="empty-state" style="display:none">
+      <div class="empty-icon">⚠️</div>
+      Nenhum desvio reportado ainda.<br>
+      Clique em <strong>+ Reportar desvio</strong> para começar.
+    </div>
+  </div>
+
 </div>
 </div>
 
@@ -503,6 +574,82 @@
   </div>
 </div>
 
+<!-- MODAL VALIDADO -->
+<div class="modal-overlay hidden" id="val-modal-overlay" onclick="closeValModalOutside(event)">
+  <div class="modal">
+    <h2 id="val-modal-title">Registrar validação</h2>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Tipo</label>
+        <select class="form-select" id="vf-tipo"><option value="evento">Evento</option><option value="atributo">Atributo</option><option value="feature">Feature</option></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Produto</label>
+        <select class="form-select" id="vf-bu"><option value="Residência">Residência</option><option value="IPEMED">IPEMED</option><option value="Afya Papers">Afya Papers</option></select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Nome do evento / atributo / feature</label>
+      <input class="form-input" id="vf-nome" type="text" placeholder="ex: opportunity_won, cdp_cfm_specialty, Segment Extensions" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Como usar — comportamento validado</label>
+      <textarea class="form-textarea" id="vf-desc" placeholder="Descreva como funciona, em qual Canvas foi testado e o que foi confirmado."></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Validado por</label>
+      <input class="form-input" id="vf-solicitante" type="text" placeholder="Seu nome" />
+    </div>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="closeValModal()">Cancelar</button>
+      <button class="btn-primary" onclick="saveVal()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL TRUNCADO -->
+<div class="modal-overlay hidden" id="trun-modal-overlay" onclick="closeTrunModalOutside(event)">
+  <div class="modal" style="max-width:560px">
+    <h2 id="trun-modal-title">Reportar desvio</h2>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Tipo</label>
+        <select class="form-select" id="tf-tipo"><option value="evento">Evento</option><option value="atributo">Atributo</option></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Produto</label>
+        <select class="form-select" id="tf-bu"><option value="Residência">Residência</option><option value="IPEMED">IPEMED</option><option value="Afya Papers">Afya Papers</option></select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Nome do evento / atributo</label>
+      <input class="form-input" id="tf-nome" type="text" placeholder="ex: cdp_cfm_specialty, opportunity_updated" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Comportamento esperado</label>
+      <textarea class="form-textarea" id="tf-esperado" placeholder="O que deveria acontecer?"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Comportamento observado</label>
+      <textarea class="form-textarea" id="tf-observado" placeholder="O que aconteceu de fato? Inclua evidências se possível."></textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Reportado por</label>
+        <input class="form-input" id="tf-solicitante" type="text" placeholder="Seu nome" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <select class="form-select" id="tf-status"><option value="reportado">🔴 Reportado</option><option value="em-analise">🔄 Em análise</option><option value="resolvido">✅ Resolvido</option></select>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="closeTrunModal()">Cancelar</button>
+      <button class="btn-primary" onclick="saveTrun()">Salvar</button>
+    </div>
+  </div>
+</div>
+
 <script id="__req_data__" type="application/json">[]</script>
 <!-- TOAST -->
 <div id="toast" style="position:fixed;bottom:1.5rem;right:1.5rem;padding:10px 16px;border-radius:8px;font-size:13px;border:1px solid;opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:2000;font-family:var(--sans)"></div>
@@ -512,6 +659,10 @@
   .status-aguardando{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-border)}
   .status-em-alinhamento{background:var(--accent-bg);color:var(--accent);border:1px solid var(--accent-border)}
   .status-a-testar{background:rgba(234,211,70,0.12);color:#d4ac0d;border:1px solid rgba(234,211,70,0.3)}
+  .req-type-feature{background:var(--purple-bg);color:var(--purple);border:1px solid var(--purple-border)}
+  .status-reportado{background:var(--red-bg);color:var(--red);border:1px solid rgba(245,101,101,0.3)}
+  .status-em-analise{background:var(--accent-bg);color:var(--accent);border:1px solid var(--accent-border)}
+  .status-resolvido{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border)}
 </style>
 <script>
   const SUPA_URL='https://xwnejtcalijgaaosdici.supabase.co';
@@ -539,6 +690,8 @@
     document.getElementById('section-'+id).classList.add('active');
     btn.classList.add('active');
     if(id==='solicitacoes')loadRequests();
+    if(id==='validado')loadValidados();
+    if(id==='truncado')loadTruncados();
   }
 
   function toggle(header){
@@ -689,6 +842,284 @@
     t.style.borderColor=type==='error'?'var(--red)':'var(--green)';
     t.classList.add('show');
     setTimeout(()=>t.classList.remove('show'),3000);
+  }
+
+
+  // ─── VALIDADO ───────────────────────────────────────────────────────────────
+  let validados=[];let valEditingId=null;let valFilters={tipo:'todos',bu:'todas'};
+
+  async function loadValidados(){
+    const list=document.getElementById('val-list');
+    list.innerHTML='<div style="text-align:center;padding:2rem;color:var(--text-dim);font-size:13px;">Carregando...</div>';
+    try{
+      const data=await sbFetch('validados?select=*&order=criado_em.desc');
+      validados=(data||[]).map(r=>({
+        id:r.id,tipo:r.tipo,bu:r.bu,nome:r.nome,
+        desc:r.descricao||'',solicitante:r.solicitante||'',
+        data:r.criado_em?new Date(r.criado_em).toLocaleDateString('pt-BR'):''
+      }));
+      renderValidados();
+    }catch(e){
+      list.innerHTML='';
+      showToast('Erro ao carregar: '+e.message,'error');
+    }
+  }
+
+  function renderValidados(){
+    const list=document.getElementById('val-list');
+    const empty=document.getElementById('val-empty');
+    document.getElementById('val-stat-total').textContent=validados.length;
+    document.getElementById('val-stat-evento').textContent=validados.filter(r=>r.tipo==='evento').length;
+    document.getElementById('val-stat-atributo').textContent=validados.filter(r=>r.tipo==='atributo').length;
+    document.getElementById('val-stat-feature').textContent=validados.filter(r=>r.tipo==='feature').length;
+    let filtered=validados.filter(r=>{
+      if(valFilters.tipo!=='todos'&&r.tipo!==valFilters.tipo)return false;
+      if(valFilters.bu!=='todas'&&r.bu!==valFilters.bu)return false;
+      return true;
+    });
+    if(filtered.length===0){list.innerHTML='';empty.style.display='';return}
+    empty.style.display='none';
+    list.innerHTML=filtered.map(r=>`
+      <div class="req-card">
+        <div class="req-card-header">
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+              <span class="req-type-badge req-type-${r.tipo}">${r.tipo}</span>
+              <span class="req-card-name">${r.nome}</span>
+            </div>
+            <div style="display:flex;gap:12px;flex-wrap:wrap">
+              <span style="font-size:11px;color:var(--text-dim)">Produto: <span style="color:var(--text-muted)">${r.bu}</span></span>
+              <span style="font-size:11px;color:var(--text-dim)">Por: <span style="color:var(--text-muted)">${r.solicitante||'—'}</span></span>
+              <span style="font-size:11px;color:var(--text-dim)">${r.data}</span>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+            <span class="req-status status-concluido" style="cursor:default">✅ Validado</span>
+            <button class="btn-icon" onclick="openValModal('${r.id}')" title="Editar">✎</button>
+            <button class="btn-icon danger" onclick="deleteVal('${r.id}')" title="Remover">✕</button>
+          </div>
+        </div>
+        ${r.desc?`<div class="req-detail">${r.desc}</div>`:''}
+      </div>`).join('');
+  }
+
+  function setValFilter(key,val,btn){
+    valFilters[key]=val;
+    if(btn){btn.parentNode.querySelectorAll('.ftab').forEach(t=>t.classList.remove('active'));btn.classList.add('active')}
+    renderValidados();
+  }
+
+  function openValModal(id){
+    valEditingId=id||null;
+    document.getElementById('val-modal-title').textContent=id?'Editar validação':'Registrar validação';
+    if(id){
+      const r=validados.find(r=>r.id===id);
+      document.getElementById('vf-tipo').value=r.tipo;
+      document.getElementById('vf-bu').value=r.bu;
+      document.getElementById('vf-nome').value=r.nome;
+      document.getElementById('vf-desc').value=r.desc||'';
+      document.getElementById('vf-solicitante').value=r.solicitante||'';
+    }else{
+      document.getElementById('vf-tipo').value='evento';
+      document.getElementById('vf-bu').value='Residência';
+      document.getElementById('vf-nome').value='';
+      document.getElementById('vf-desc').value='';
+      document.getElementById('vf-solicitante').value=validados.length?validados[0].solicitante:'';
+    }
+    document.getElementById('val-modal-overlay').classList.remove('hidden');
+    setTimeout(()=>document.getElementById('vf-nome').focus(),50);
+  }
+
+  function closeValModal(){document.getElementById('val-modal-overlay').classList.add('hidden');valEditingId=null}
+  function closeValModalOutside(e){if(e.target===document.getElementById('val-modal-overlay'))closeValModal()}
+
+  async function saveVal(){
+    const nome=document.getElementById('vf-nome').value.trim();
+    if(!nome){document.getElementById('vf-nome').focus();return}
+    const btn=document.querySelector('#val-modal-overlay .btn-primary');
+    btn.textContent='Salvando...';btn.disabled=true;
+    const payload={
+      tipo:document.getElementById('vf-tipo').value,
+      bu:document.getElementById('vf-bu').value,
+      nome,
+      descricao:document.getElementById('vf-desc').value.trim(),
+      solicitante:document.getElementById('vf-solicitante').value.trim()
+    };
+    try{
+      if(valEditingId){
+        await sbFetch('validados?id=eq.'+valEditingId,{method:'PATCH',body:JSON.stringify(payload)});
+      }else{
+        await sbFetch('validados',{method:'POST',body:JSON.stringify({id:'val_'+Date.now(),...payload})});
+      }
+      closeValModal();
+      await loadValidados();
+      showToast(valEditingId?'Validação atualizada!':'Validação registrada!');
+    }catch(e){
+      showToast('Erro ao salvar: '+e.message,'error');
+    }finally{
+      btn.textContent='Salvar';btn.disabled=false;
+    }
+  }
+
+  async function deleteVal(id){
+    if(!confirm('Remover esta validação?'))return;
+    try{
+      await sbFetch('validados?id=eq.'+id,{method:'DELETE'});
+      await loadValidados();
+      showToast('Validação removida.');
+    }catch(e){showToast('Erro ao remover: '+e.message,'error')}
+  }
+
+  // ─── TRUNCADO ───────────────────────────────────────────────────────────────
+  let truncados=[];let trunEditingId=null;let trunFilters={tipo:'todos',bu:'todas'};
+
+  const TRUN_STATUS_ORDER=['reportado','em-analise','resolvido'];
+  const TRUN_STATUS_LABEL={'reportado':'🔴 Reportado','em-analise':'🔄 Em análise','resolvido':'✅ Resolvido'};
+  const TRUN_STATUS_CLASS={'reportado':'status-reportado','em-analise':'status-em-analise','resolvido':'status-resolvido'};
+
+  async function loadTruncados(){
+    const list=document.getElementById('trun-list');
+    list.innerHTML='<div style="text-align:center;padding:2rem;color:var(--text-dim);font-size:13px;">Carregando...</div>';
+    try{
+      const data=await sbFetch('truncados?select=*&order=criado_em.desc');
+      truncados=(data||[]).map(r=>({
+        id:r.id,tipo:r.tipo,bu:r.bu,nome:r.nome,
+        esperado:r.comportamento_esperado||'',
+        observado:r.comportamento_observado||'',
+        solicitante:r.solicitante||'',
+        status:r.status||'reportado',
+        data:r.criado_em?new Date(r.criado_em).toLocaleDateString('pt-BR'):''
+      }));
+      renderTruncados();
+    }catch(e){
+      list.innerHTML='';
+      showToast('Erro ao carregar: '+e.message,'error');
+    }
+  }
+
+  function renderTruncados(){
+    const list=document.getElementById('trun-list');
+    const empty=document.getElementById('trun-empty');
+    document.getElementById('trun-stat-total').textContent=truncados.length;
+    document.getElementById('trun-stat-reportado').textContent=truncados.filter(r=>r.status==='reportado').length;
+    document.getElementById('trun-stat-em-analise').textContent=truncados.filter(r=>r.status==='em-analise').length;
+    document.getElementById('trun-stat-resolvido').textContent=truncados.filter(r=>r.status==='resolvido').length;
+    let filtered=truncados.filter(r=>{
+      if(trunFilters.tipo!=='todos'&&r.tipo!==trunFilters.tipo)return false;
+      if(trunFilters.bu!=='todas'&&r.bu!==trunFilters.bu)return false;
+      return true;
+    });
+    if(filtered.length===0){list.innerHTML='';empty.style.display='';return}
+    empty.style.display='none';
+    list.innerHTML=filtered.map(r=>`
+      <div class="req-card">
+        <div class="req-card-header">
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+              <span class="req-type-badge req-type-${r.tipo}">${r.tipo}</span>
+              <span class="req-card-name">${r.nome}</span>
+            </div>
+            <div style="display:flex;gap:12px;flex-wrap:wrap">
+              <span style="font-size:11px;color:var(--text-dim)">Produto: <span style="color:var(--text-muted)">${r.bu}</span></span>
+              <span style="font-size:11px;color:var(--text-dim)">Por: <span style="color:var(--text-muted)">${r.solicitante||'—'}</span></span>
+              <span style="font-size:11px;color:var(--text-dim)">${r.data}</span>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+            <button class="req-status ${TRUN_STATUS_CLASS[r.status]}" onclick="cycleTrunStatus('${r.id}')" title="Clique para avançar">${TRUN_STATUS_LABEL[r.status]}</button>
+            <button class="btn-icon" onclick="openTrunModal('${r.id}')" title="Editar">✎</button>
+            <button class="btn-icon danger" onclick="deleteTrun('${r.id}')" title="Remover">✕</button>
+          </div>
+        </div>
+        ${(r.esperado||r.observado)?`
+          <div class="req-detail" style="display:grid;grid-template-columns:${r.esperado&&r.observado?'1fr 1fr':'1fr'};gap:16px">
+            ${r.esperado?`<div><div style="font-size:10px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">Esperado</div><div style="color:var(--text-muted)">${r.esperado}</div></div>`:''}
+            ${r.observado?`<div><div style="font-size:10px;font-weight:600;color:var(--red);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">Observado</div><div style="color:var(--text-muted)">${r.observado}</div></div>`:''}
+          </div>`:''}
+      </div>`).join('');
+  }
+
+  function setTrunFilter(key,val,btn){
+    trunFilters[key]=val;
+    if(btn){btn.parentNode.querySelectorAll('.ftab').forEach(t=>t.classList.remove('active'));btn.classList.add('active')}
+    renderTruncados();
+  }
+
+  function openTrunModal(id){
+    trunEditingId=id||null;
+    document.getElementById('trun-modal-title').textContent=id?'Editar desvio':'Reportar desvio';
+    if(id){
+      const r=truncados.find(r=>r.id===id);
+      document.getElementById('tf-tipo').value=r.tipo;
+      document.getElementById('tf-bu').value=r.bu;
+      document.getElementById('tf-nome').value=r.nome;
+      document.getElementById('tf-esperado').value=r.esperado||'';
+      document.getElementById('tf-observado').value=r.observado||'';
+      document.getElementById('tf-solicitante').value=r.solicitante||'';
+      document.getElementById('tf-status').value=r.status||'reportado';
+    }else{
+      document.getElementById('tf-tipo').value='evento';
+      document.getElementById('tf-bu').value='Residência';
+      document.getElementById('tf-nome').value='';
+      document.getElementById('tf-esperado').value='';
+      document.getElementById('tf-observado').value='';
+      document.getElementById('tf-status').value='reportado';
+      document.getElementById('tf-solicitante').value=truncados.length?truncados[0].solicitante:'';
+    }
+    document.getElementById('trun-modal-overlay').classList.remove('hidden');
+    setTimeout(()=>document.getElementById('tf-nome').focus(),50);
+  }
+
+  function closeTrunModal(){document.getElementById('trun-modal-overlay').classList.add('hidden');trunEditingId=null}
+  function closeTrunModalOutside(e){if(e.target===document.getElementById('trun-modal-overlay'))closeTrunModal()}
+
+  async function saveTrun(){
+    const nome=document.getElementById('tf-nome').value.trim();
+    if(!nome){document.getElementById('tf-nome').focus();return}
+    const btn=document.querySelector('#trun-modal-overlay .btn-primary');
+    btn.textContent='Salvando...';btn.disabled=true;
+    const payload={
+      tipo:document.getElementById('tf-tipo').value,
+      bu:document.getElementById('tf-bu').value,
+      nome,
+      comportamento_esperado:document.getElementById('tf-esperado').value.trim(),
+      comportamento_observado:document.getElementById('tf-observado').value.trim(),
+      solicitante:document.getElementById('tf-solicitante').value.trim(),
+      status:document.getElementById('tf-status').value
+    };
+    try{
+      if(trunEditingId){
+        await sbFetch('truncados?id=eq.'+trunEditingId,{method:'PATCH',body:JSON.stringify(payload)});
+      }else{
+        await sbFetch('truncados',{method:'POST',body:JSON.stringify({id:'trun_'+Date.now(),...payload})});
+      }
+      closeTrunModal();
+      await loadTruncados();
+      showToast(trunEditingId?'Desvio atualizado!':'Desvio reportado!');
+    }catch(e){
+      showToast('Erro ao salvar: '+e.message,'error');
+    }finally{
+      btn.textContent='Salvar';btn.disabled=false;
+    }
+  }
+
+  async function deleteTrun(id){
+    if(!confirm('Remover este desvio?'))return;
+    try{
+      await sbFetch('truncados?id=eq.'+id,{method:'DELETE'});
+      await loadTruncados();
+      showToast('Desvio removido.');
+    }catch(e){showToast('Erro ao remover: '+e.message,'error')}
+  }
+
+  async function cycleTrunStatus(id){
+    const r=truncados.find(r=>r.id===id);
+    const next=TRUN_STATUS_ORDER[(TRUN_STATUS_ORDER.indexOf(r.status)+1)%TRUN_STATUS_ORDER.length];
+    try{
+      await sbFetch('truncados?id=eq.'+id,{method:'PATCH',body:JSON.stringify({status:next})});
+      r.status=next;
+      renderTruncados();
+    }catch(e){showToast('Erro ao atualizar status: '+e.message,'error')}
   }
 
   loadRequests();
