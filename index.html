@@ -99,9 +99,19 @@
   .req-card-header{padding:12px 16px;display:flex;align-items:center;gap:10px}
   .req-card-name{font-family:var(--mono);font-size:13px;color:var(--text);flex:1}
   .req-type-badge{font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px;font-family:var(--mono)}
+  .priority-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;font-family:var(--mono);letter-spacing:0.04em}
+  .priority-p1{background:rgba(245,101,101,0.15);color:#f87171;border:1px solid rgba(245,101,101,0.35)}
+  .priority-p2{background:rgba(245,166,35,0.15);color:var(--amber);border:1px solid var(--amber-border)}
+  .priority-p3{background:rgba(255,255,255,0.05);color:var(--text-muted);border:1px solid var(--border-strong)}
   .req-type-evento{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border)}
   .req-type-atributo{background:var(--accent-bg);color:var(--accent);border:1px solid var(--accent-border)}
   .req-status{font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px;font-family:var(--mono);cursor:pointer;border:none}
+  .req-status-select{font-size:11px;font-weight:600;padding:3px 8px;border-radius:10px;font-family:var(--mono);cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%237a7f8a'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 7px center;padding-right:22px}
+  .req-status-select.status-a-solicitar{background-color:var(--red-bg);color:var(--red);border:1px solid rgba(245,101,101,0.3)}
+  .req-status-select.status-aguardando{background-color:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-border)}
+  .req-status-select.status-em-alinhamento{background-color:var(--accent-bg);color:var(--accent);border:1px solid var(--accent-border)}
+  .req-status-select.status-a-testar{background-color:rgba(234,211,70,0.12);color:#d4ac0d;border:1px solid rgba(234,211,70,0.3)}
+  .req-status-select option{background:var(--bg-card);color:var(--text);font-weight:500}
   .status-pendente{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-border)}
   .status-em-andamento{background:var(--accent-bg);color:var(--accent);border:1px solid var(--accent-border)}
   .status-concluido{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border)}
@@ -567,6 +577,14 @@
         <select class="form-select" id="f-status"><option value="a-solicitar">🔴 A solicitar</option><option value="aguardando">⏳ Aguardando</option><option value="em-alinhamento">🔄 Em alinhamento</option><option value="a-testar">🟡 A testar</option></select>
       </div>
     </div>
+    <div class="form-group">
+      <label class="form-label">Prioridade</label>
+      <select class="form-select" id="f-prioridade">
+        <option value="p1">P1 — Alta</option>
+        <option value="p2">P2 — Média</option>
+        <option value="p3" selected>P3 — Baixa</option>
+      </select>
+    </div>
     <div class="modal-actions">
       <button class="btn-ghost" onclick="closeModal()">Cancelar</button>
       <button class="btn-primary" onclick="saveReq()">Salvar</button>
@@ -712,13 +730,15 @@
     const list=document.getElementById('req-list');
     list.innerHTML='<div style="text-align:center;padding:2rem;color:var(--text-dim);font-size:13px;">Carregando...</div>';
     try{
-      const data=await sbFetch('solicitacoes?select=*&order=criado_em.desc');
+      const data=await sbFetch('solicitacoes?select=*&order=prioridade.asc,criado_em.desc');
       requests=(data||[]).map(r=>({
         id:r.id,tipo:r.tipo,bu:r.bu,nome:r.nome,
         desc:r.descricao||'',solicitante:r.solicitante||'',
-        status:r.status,
+        status:r.status,prioridade:r.prioridade||'p3',
         data:r.criado_em?new Date(r.criado_em).toLocaleDateString('pt-BR'):''
       }));
+      const pOrder={'p1':0,'p2':1,'p3':2};
+      requests.sort((a,b)=>(pOrder[a.prioridade]??2)-(pOrder[b.prioridade]??2));
       renderList();
     }catch(e){
       list.innerHTML='';
@@ -742,6 +762,7 @@
           <div style="flex:1;min-width:0">
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
               <span class="req-type-badge req-type-${r.tipo}">${r.tipo}</span>
+              <span class="priority-badge priority-${r.prioridade}">${r.prioridade.toUpperCase()}</span>
               <span class="req-card-name">${r.nome}</span>
             </div>
             <div style="display:flex;gap:12px;flex-wrap:wrap">
@@ -751,7 +772,9 @@
             </div>
           </div>
           <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
-            <button class="req-status ${STATUS_CLASS[r.status]}" onclick="cycleStatus('${r.id}')" title="Clique para avançar">${STATUS_LABEL[r.status]}</button>
+            <select class="req-status-select ${STATUS_CLASS[r.status]}" onchange="changeStatus('${r.id}',this)">
+              ${STATUS_ORDER.map(s=>`<option value="${s}" ${r.status===s?'selected':''}>${STATUS_LABEL[s]}</option>`).join('')}
+            </select>
             <button class="btn-icon" onclick="openModal('${r.id}')" title="Editar">✎</button>
             <button class="btn-icon danger" onclick="deleteReq('${r.id}')" title="Remover">✕</button>
           </div>
@@ -771,6 +794,7 @@
       document.getElementById('f-desc').value=r.desc||'';
       document.getElementById('f-solicitante').value=r.solicitante||'';
       document.getElementById('f-status').value=r.status;
+      document.getElementById('f-prioridade').value=r.prioridade||'p3';
     }else{
       document.getElementById('f-tipo').value='evento';
       document.getElementById('f-bu').value='Residência';
@@ -797,7 +821,8 @@
       nome,
       descricao:document.getElementById('f-desc').value.trim(),
       solicitante:document.getElementById('f-solicitante').value.trim(),
-      status:document.getElementById('f-status').value
+      status:document.getElementById('f-status').value,
+      prioridade:document.getElementById('f-prioridade').value
     };
     try{
       if(editingId){
@@ -822,6 +847,20 @@
       await loadRequests();
       showToast('Solicitação removida.');
     }catch(e){showToast('Erro ao remover: '+e.message,'error')}
+  }
+
+  async function changeStatus(id, selectEl){
+    const next=selectEl.value;
+    const r=requests.find(r=>r.id===id);
+    selectEl.className='req-status-select '+STATUS_CLASS[next];
+    try{
+      await sbFetch('solicitacoes?id=eq.'+id,{method:'PATCH',body:JSON.stringify({status:next})});
+      r.status=next;
+    }catch(e){
+      selectEl.className='req-status-select '+STATUS_CLASS[r.status];
+      selectEl.value=r.status;
+      showToast('Erro ao atualizar status: '+e.message,'error');
+    }
   }
 
   async function cycleStatus(id){
